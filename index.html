@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Joke Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* Background animation */
+        body {
+            background: linear-gradient(45deg, #e6ccff, #b380ff, #d6b3ff, #a366ff);
+            background-size: 400% 400%;
+            animation: gradientAnimation 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating bubbles */
+        .bubble {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: floatAnimation 6s infinite ease-in-out;
+        }
+
+        @keyframes floatAnimation {
+            0% { transform: translateY(0px) scale(1); opacity: 0.7; }
+            50% { transform: translateY(-40px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+        }
+
+        /* Random positioning for bubbles */
+        .bubble:nth-child(1) { left: 10%; animation-duration: 6s; }
+        .bubble:nth-child(2) { left: 25%; animation-duration: 7s; width: 40px; height: 40px; }
+        .bubble:nth-child(3) { left: 50%; animation-duration: 8s; width: 60px; height: 60px; }
+        .bubble:nth-child(4) { left: 75%; animation-duration: 5s; }
+        .bubble:nth-child(5) { left: 90%; animation-duration: 9s; width: 30px; height: 30px; }
+
+        /* Card styling */
+        .container {
+            max-width: 600px;
+            text-align: center;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* Button */
+        .btn-primary {
+            background-color: #b380ff;
+            border: none;
+            transition: background 0.3s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #a366ff;
+        }
+
+        /* Joke text animation */
+        #joke-text {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .fade-in {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="container">
+        <h1 class="my-4 text-white fw-bold">Random Joke Generator</h1>
+        <div class="card p-4">
+            <p id="joke-text" class="fs-4 text-dark">Click below to get a joke!</p>
+            <button class="btn btn-primary mt-3" onclick="fetchJoke()">Get Joke</button>
+        </div>
+    </div>
+
+    <script>
+        function fetchJoke() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://v2.jokeapi.dev/joke/Any", true);
+            xhr.onload = function () {
+                if (xhr.status == 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    let jokeText = response.type === "twopart"
+                        ? `${response.setup} 🤔 <br><strong>${response.delivery} 😆</strong>`
+                        : response.joke;
+                    let jokeElement = document.getElementById("joke-text");
+                    jokeElement.classList.remove("fade-in");
+                    setTimeout(() => {
+                        jokeElement.innerHTML = jokeText;
+                        jokeElement.classList.add("fade-in");
+                    }, 100);
+                } else {
+                    document.getElementById("joke-text").innerText = "Failed to fetch joke!";
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
